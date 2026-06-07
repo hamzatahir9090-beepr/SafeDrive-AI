@@ -1,137 +1,257 @@
-This is a professional, step-by-step guide designed for a collaborator. It covers every technical "fix" we implemented (MediaPipe versions, Local Browser paths, and FFmpeg) so that the project runs perfectly on any system.
+# 🛡️ SafeDrive AI
 
-***
+SafeDrive AI is a real-time driver monitoring system that uses Computer Vision and AI to detect driver fatigue and distraction. When a critical event is detected, the system automatically triggers an emergency response workflow through WhatsApp, sending:
 
-# 🛡️ SafeDrive AI: Setup & Execution Guide
+* 📍 Live Location
+* 📸 Three Incident Photos
+* 🎥 Five-Second Video Recording
+* 🚨 Emergency Alert Message
 
-SafeDrive AI is a real-time driver monitoring system that uses Computer Vision to detect fatigue/distraction and triggers an automated SOS sequence via WhatsApp (Location + 3 Photos + 5s Video).
+---
+
+## 🏗️ Architecture
+
+| Service            | Technology             | Purpose                                   |
+| ------------------ | ---------------------- | ----------------------------------------- |
+| Frontend Dashboard | Next.js                | Driver interface and monitoring dashboard |
+| AI Backend         | FastAPI + MediaPipe    | Fatigue and distraction detection         |
+| WhatsApp Bridge    | Node.js + WhatsApp Web | Emergency alert delivery                  |
+
+---
 
 ## 📋 Prerequisites
-Before starting, ensure the following are installed on the system:
-1. **Node.js** (v18 or higher)
-2. **Python** (3.10 to 3.12)
-3. **FFmpeg** (Required for WhatsApp Video processing)
-   * *Arch Linux:* `sudo pacman -S ffmpeg unzip`
-   * *Ubuntu/Debian:* `sudo apt install ffmpeg unzip`
-   * *Windows:* Install via [Choco](https://chocolatey.org/) or official website.
+
+Install the following before running the project:
+
+* Node.js (v18 or higher)
+* Python (3.10 – 3.12)
+* FFmpeg
+
+### Arch Linux
+
+```bash
+sudo pacman -S ffmpeg unzip
+```
+
+### Ubuntu / Debian
+
+```bash
+sudo apt install ffmpeg unzip
+```
+
+### Windows
+
+Install FFmpeg and ensure it is available in your system PATH.
 
 ---
 
-## 🚀 Step 1: The WhatsApp Bridge (Node.js)
-The Bridge acts as a "Virtual Phone" that manages WhatsApp sessions.
+## 🚀 1. Start the WhatsApp Bridge
 
-1. **Navigate to the folder:**
-   ```bash
-   cd whatsapp-bridge
-   ```
-2. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-3. **Install the Local Browser (System Independent):**
-   *To ensure the bridge works on any laptop without searching for Chrome, we install a local version:*
-   ```bash
-   npx puppeteer browsers install chrome-headless-shell --path .local-browser
-   ```
-4. **Manual Extraction (For Linux/Arch Users):**
-   *If the bridge fails to find the browser, manually unzip it:*
-   ```bash
-   cd .local-browser/chrome-headless-shell
-   unzip *.zip -d linux-146.0.7680.31/  # Use the version folder name found there
-   chmod -R +x .
-   cd ../..
-   ```
-5. **Start the Bridge:**
-   ```bash
-   node index.js
-   ```
-6. **Scan the QR Code:**
-   A QR code will appear for the `SYSTEM_ADMIN` account. Scan it with your phone. The bridge is ready when it prints: `WhatsApp Bridge READY`.
+Navigate to the bridge directory and install dependencies:
+
+```bash
+cd whatsapp-bridge
+npm install
+```
+
+Start the bridge:
+
+```bash
+node index.js
+```
+
+Scan the generated QR code using WhatsApp.
+
+Expected output:
+
+```text
+WhatsApp Bridge READY
+```
 
 ---
 
-## 🧠 Step 2: The AI Backend (FastAPI)
-The backend processes the video feed and calculates EAR (Eye Aspect Ratio).
+## 🧠 2. Start the AI Backend
 
-1. **Navigate to the folder:**
-   ```bash
-   cd backend
-   ```
-2. **Create & Activate Virtual Environment:**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # venv\Scripts\activate  # Windows
-   ```
-3. **Install Dependencies (Specific Fix):**
-   *We use a specific MediaPipe version to avoid compatibility errors with Python 3.12:*
-   ```bash
-   pip install fastapi uvicorn opencv-python numpy httpx
-   pip i[k0haii@BlueBox backend]$ python3.12 -m venv venv
-bash: python3.12: command not found
-[k0haii@BlueBox backend]$ 
-nstall mediapipe==0.10.13
-   ```
-4. **Start the AI Server:**
-   ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-   ```
+Navigate to the backend directory:
 
----
+```bash
+cd backend
+```
 
-## 💻 Step 3: The Dashboard (Next.js)
-The frontend HUD for the driver.
+Create a virtual environment:
 
-1. **Navigate to the folder:**
-   ```bash
-   cd frontend
-   ```
-2. **Install UI Libraries:**
-   ```bash
-   npm install
-   ```
-3. **Start the Dashboard:**
-   ```bash
-   npm run dev
-   ```
-4. **Access the App:**
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+```bash
+python -m venv venv
+```
 
----
+Activate the virtual environment:
 
-## 🛠️ Usage & Demo Instructions
+### Linux / macOS
 
-### 1. The Setup Wizard
-On the first run, the app will prompt for:
-*   **Driver Name & Phone:** Your identification.
-*   **Guardian Number:** The recipient of the SOS (Format: `923XXXXXXXXX`).
-*   **Protocol:** 
-    *   *System Number:* Uses the developer's pre-linked WhatsApp (Fastest).
-    *   *Personal Number:* Shows a QR code for the driver to link their own account.
+```bash
+source venv/bin/activate
+```
 
-### 2. Monitoring
-*   Click **Initialize** then **Start Driving**.
-*   The AI Mesh (dots) will appear on your face.
-*   **Manual SOS:** Click the "Initiate SOS" button.
-*   **Auto SOS:** Close your eyes for **3 seconds straight**.
+### Windows
 
-### 3. The Emergency Packet
-The recipient will receive:
-1.  **Text Alert:** With a real Google Maps link.
-2.  **3 Photos:** Captured every 5 seconds.
-3.  **Video Clip:** A 5-second recording of the incident.
+```powershell
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install fastapi uvicorn opencv-python numpy httpx
+pip install mediapipe==0.10.13
+```
+
+Start the backend server:
+
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Backend URL:
+
+```text
+http://localhost:8000
+```
 
 ---
 
-## ⚠️ Common Fixes (Troubleshooting)
+## 💻 3. Start the Frontend Dashboard
 
-*   **Camera not working?** 
-    Ensure no other app (Zoom, Discord) is using the webcam. On Arch, ensure the driver is loaded: `sudo modprobe v4l2loopback`.
-*   **WhatsApp Timeout?**
-    The video file takes about 10 seconds to process and upload. Wait for the `✅ Video sent` log in the bridge terminal.
-*   **QR Code not appearing in UI?**
-    Ensure the `whatsapp-bridge` is running on port 3001 and your browser allows `localhost` CORS requests.
+Navigate to the frontend directory:
 
-***
+```bash
+cd frontend
+```
 
-**Status:** ALL SYSTEMS OPERATIONAL 🟢
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## 🎯 Usage
+
+### Initial Setup
+
+Provide:
+
+* Driver Name
+* Driver Phone Number
+* Guardian Phone Number (`923XXXXXXXXX`)
+
+Choose one of the following modes:
+
+#### System Number
+
+Uses a pre-configured WhatsApp account.
+
+#### Personal Number
+
+Allows the driver to link their own WhatsApp account.
+
+---
+
+### Start Monitoring
+
+1. Click **Initialize**
+2. Click **Start Driving**
+
+The AI facial landmark mesh should appear on the driver's face.
+
+---
+
+### Emergency Triggers
+
+#### Manual SOS
+
+Click **Initiate SOS**.
+
+#### Automatic SOS
+
+An alert is triggered when fatigue conditions are detected.
+
+---
+
+## 📦 Emergency Packet
+
+When an incident is detected, the guardian receives:
+
+* Emergency alert message
+* Live Google Maps location
+* Three captured images
+* Five-second incident video
+
+---
+
+## 🛠️ Troubleshooting
+
+### Webcam Not Detected
+
+Ensure no other application is currently using the webcam.
+
+Examples:
+
+* Zoom
+* Discord
+* OBS Studio
+* Google Meet
+
+---
+
+### WhatsApp Video Delay
+
+Video processing may take several seconds.
+
+Wait until:
+
+```text
+✅ Video sent
+```
+
+appears in the bridge logs.
+
+---
+
+### QR Code Not Appearing
+
+Verify that:
+
+* The WhatsApp Bridge is running
+* Port `3001` is available
+* Localhost requests are not blocked
+
+---
+
+## 🔧 Technical Notes
+
+* MediaPipe is pinned to `0.10.13` for compatibility and stability.
+* FFmpeg is required for video processing before WhatsApp delivery.
+* The WhatsApp Bridge uses the system-installed Chrome/Chromium browser.
+
+---
+
+## ✅ Status
+
+* WhatsApp Bridge Running
+* AI Backend Running
+* Frontend Dashboard Running
+
+SafeDrive AI is ready for monitoring.
